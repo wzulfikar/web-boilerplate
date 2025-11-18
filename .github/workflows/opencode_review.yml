@@ -64,7 +64,7 @@ jobs:
           mkdir -p $HOME/.local/share/opencode/
           echo '{"zai-coding-plan": { "type": "api", "key": "'$ZAI_API_KEY'"}}' > $HOME/.local/share/opencode/auth.json
 
-          # Configure MCP for OpenCode
+          # Configure MCP
           mkdir -p $HOME/.config/opencode/
           cat << EOF > $HOME/.config/opencode/mcp.json
           {
@@ -81,7 +81,9 @@ jobs:
           }
           EOF
 
-          # Start OpenCode with PR review prompt. Be careful when enclosing the prompt in quotes.
+          set -e # Exit with error if opencode fails
+
+          # Start OpenCode with PR review prompt.
           opencode run --model $OPENCODE_MODEL << 'EOF'
           A new pull request has been created. You are a diligent bug finder. Check the code changes in this pull request for potential bugs. Read the rules file for guideline. Only review the changes found in diffs, but feel free to read the entire file to get more context. ONLY CHECK FOR POTENTIAL BUGS. Be concise and to the point. Start directly with the comment, no need to state e.g. "The guideline states...". Wrap codes in backticks (`) or triple backticks (```) for inline and multi-line code respectively.
 
