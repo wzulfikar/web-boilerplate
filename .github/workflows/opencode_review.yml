@@ -25,6 +25,7 @@ jobs:
           ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
           OPENCODE_MODEL: "zai-coding-plan/glm-4.6"
           OPENCODE_PERMISSION: '{ "bash": { "./post_pr_comment*": "allow", "gh*": "allow", "gh api*": "deny", "gh pr review*": "deny", "*": "deny" } }'
+        # Note: replace the ".rules" file with the path to your rules file
         run: |
           # Create post_pr_comment script
           cat << 'EOF' > $PWD/post_pr_comment
@@ -49,7 +50,8 @@ jobs:
           echo '{"zai-coding-plan": { "type": "api", "key": "'$ZAI_API_KEY'"}}' > $HOME/.local/share/opencode/auth.json
 
           # Start OpenCode with PR review prompt
-          opencode run -m $OPENCODE_MODEL 'A new pull request has been created: "${{ github.event.pull_request.title }}"
+          opencode run -m $OPENCODE_MODEL << 'EOF'
+          A new pull request has been created: "${{ github.event.pull_request.title }}"
 
           <repository>
           ${{ github.repository }}
@@ -70,7 +72,7 @@ jobs:
           - Use the `post_pr_comment` command to create comments on the files for the violations.
           - Focus on changes in the diffs so you can leave the comment on the exact line number.
           - If you have a suggested fix, wrap the suggestion in codeblock.
-          - Only create comments for actual violations. Don't run any `post_pr_comment` if no violations.
+          - Only create comments for actual violations. DO NOT run any `post_pr_comment` if no violations.
           - Command format MUST be like this:
             ./post_pr_comment '[comment]' '[path-to-file]' [line]
-          "
+          EOF
