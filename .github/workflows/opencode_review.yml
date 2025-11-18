@@ -109,5 +109,5 @@ jobs:
           <pr_number>${{ github.event.pull_request.number }}</pr_number>
           <pr_title>see: ./_pr_title.md</pr_title>
           <pr_description>see: ./_pr_description.md</pr_description>
-          <rules_file>see: ./.cursorrules</rules_file>
+          <rules_file>see: ./.rules</rules_file>
           EOF

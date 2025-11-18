@@ -1,0 +1,29 @@
+{
+  "formatter": {
+    "external": {
+      "command": "biome",
+      "arguments": [
+        "check",
+        "--write",
+        "--unsafe",
+        "--stdin-file-path",
+        "{buffer_path}"
+      ]
+    }
+  },
+  "lsp": {
+    "json-language-server": {
+      "settings": {
+        "json": {
+          "schemas": [
+            {
+              // Tell LSP to not check bun.lock so we don't get false positives in Project Diagnostics.
+              "fileMatch": ["bun.lock"],
+              "schema": {}
+            }
+          ]
+        }
+      }
+    }
+  }
+}

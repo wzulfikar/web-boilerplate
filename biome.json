@@ -1,0 +1,97 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": [
+			"**/*.ts",
+			"**/*.tsx",
+			"!next-env.d.ts",
+			"!.work",
+			"!public/mockServiceWorker.js"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "space"
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"correctness": {
+				"useExhaustiveDependencies": "off",
+				"useUniqueElementIds": "off"
+			},
+			"recommended": true,
+			"a11y": {
+				"useKeyWithClickEvents": "off",
+				"useButtonType": "off",
+				"noSvgWithoutTitle": "off",
+				"noStaticElementInteractions": "off",
+				"useSemanticElements": "off"
+			},
+			"complexity": {
+				"noForEach": "off"
+			},
+			"performance": {
+				"noImgElement": "off"
+			},
+			"style": {
+				"useTemplate": "off",
+				"noParameterAssign": "off",
+				"noNonNullAssertion": "off",
+				"useAsConstAssertion": "error",
+				"useDefaultParameterLast": "error",
+				"useEnumInitializers": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error",
+				"noUselessElse": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "off",
+				"noArrayIndexKey": "off",
+				"noTsIgnore": "off",
+				"noNonNullAssertedOptionalChain": "warn"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"semicolons": "asNeeded"
+		}
+	},
+	"css": {
+		"formatter": {
+			"quoteStyle": "single"
+		}
+	},
+	"overrides": [
+		{
+			"formatter": {
+				"indentWidth": 2
+			}
+		},
+		{
+			"includes": [
+				"package.json",
+				"public/mockServiceWorker.js",
+				".work/*",
+				"ReactScanProvider.tsx"
+			],
+			"linter": {
+				"enabled": false
+			},
+			"formatter": {
+				"enabled": false
+			}
+		}
+	]
+}
