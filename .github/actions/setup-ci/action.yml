@@ -1,0 +1,59 @@
+name: "Setup Project Environment"
+description: "Sets up Node.js, Bun, dependencies, and environment for the project"
+
+inputs:
+  node-version:
+    description: "Node.js version to install"
+    required: false
+    default: "23"
+  bun-version:
+    description: "Bun version to install"
+    required: false
+    default: "1.2.22"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.bun-version }}
+
+    - uses: actions/cache@v4
+      name: Setup bun cache
+      id: bun-cache
+      with:
+        path: |
+          ~/.bun/install/cache
+          node_modules
+        key: bun-cache-${{ runner.os }}-${{ hashFiles('**/package.json', '**/bun.lock') }}
+        restore-keys: |
+          bun-cache-${{ runner.os }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        # Try frozen lockfile first for reproducibility
+        if bun install --frozen-lockfile; then
+          echo "✅ Dependencies installed with frozen lockfile"
+        else
+          echo "⚠️ Frozen lockfile failed - likely package.json was updated without updating bun.lock"
+          echo "Installing dependencies (this will update bun.lock but won't commit during PR)"
+          bun install
+          echo "✅ Dependencies installed successfully"
+
+          # In PR context, just warn about lockfile changes - don't commit
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "⚠️ bun.lock was updated during PR build. Consider updating it in your branch."
+            echo "Run 'bun install' locally and commit the updated bun.lock"
+          fi
+        fi
+
+    - name: Copy dummy env file
+      shell: bash
+      run: cp .env.example .env.local

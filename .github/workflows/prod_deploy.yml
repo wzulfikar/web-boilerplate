@@ -1,0 +1,38 @@
+name: "Prod: Deploy"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".env.production"
+      - ".env.production-local.secrets"
+      - "bin/build_and_deploy_to_vercel"
+      - "bun.lock"
+      - "next.config.ts"
+      - "public/**"
+      - "emails/**"
+      - "sanity/**"
+      - "server/**"
+      - "shared/**"
+      - "src/**"
+      - "supabase/json-schema/**"
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      NODE_MASTER_KEY: ${{ secrets.NODE_MASTER_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup project environment
+        uses: ./.github/actions/setup-ci
+
+      - name: Build and deploy
+        run: ./bin/build_and_deploy_to_vercel
