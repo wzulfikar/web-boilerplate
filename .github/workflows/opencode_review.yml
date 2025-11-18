@@ -2,11 +2,12 @@ name: OpenCode Review
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, ready_for_review, synchronize]
 
 jobs:
   code-review:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     permissions:
       contents: read
       pull-requests: write
@@ -22,57 +23,89 @@ jobs:
       - name: Review PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONTEXT7_API_KEY: ${{ secrets.CONTEXT7_API_KEY }}
           ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
           OPENCODE_MODEL: "zai-coding-plan/glm-4.6"
-          OPENCODE_PERMISSION: '{ "bash": { "./post_pr_comment*": "allow", "gh*": "allow", "gh api*": "deny", "gh pr review*": "deny", "*": "deny" } }'
-        # Note: replace the ".rules" file with the path to your rules file
+          OPENCODE_PERMISSION: '{ "bash": { "./post_comment*": "allow", "gh*": "allow", "gh api*": "deny", "gh pr review*": "deny", "*": "deny" } }'
         run: |
-          # Create post_pr_comment script
-          cat << 'EOF' > $PWD/post_pr_comment
+          # Create post_comment script
+          cat << 'EOF' > $PWD/post_comment
           #!/bin/bash
+
           # Use temporary file to store the comment so we can use full markdown format
           printf '%s' "$1" > /tmp/comment.md
-          # Strip full path to make it relative to current working directory
-          diff_path=$(realpath --relative-to=. "$2")
 
-          gh api --method POST \
-            -H 'X-GitHub-Api-Version: 2022-11-28' \
-            -H "Accept: application/vnd.github+json" \
-            /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments \
-            --raw-field 'commit_id=${{ github.event.pull_request.head.sha }}' \
-            --raw-field 'side=RIGHT' \
-            --field "body=@/tmp/comment.md" --raw-field "path=$diff_path" --field "line=$3"
+          if [ "$2" = "" ] && [ "$3" = "" ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/comment.md
+          else
+            # Strip full path to make it relative to current working directory
+            diff_path=$(realpath --relative-to=. "$2")
+            gh api --method POST \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              -H "Accept: application/vnd.github+json" \
+              /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments \
+              --raw-field 'commit_id=${{ github.event.pull_request.head.sha }}' \
+              --raw-field 'side=RIGHT' \
+              --field "body=@/tmp/comment.md" --raw-field "path=$diff_path" --field "line=$3"
+          fi
           EOF
-          chmod +x $PWD/post_pr_comment
+          chmod +x $PWD/post_comment
+
+          # Create _pr_title.md file
+          cat << 'EOF' > $PWD/_pr_title.md
+          ${{ github.event.pull_request.title }}
+          EOF
+          # Create pr_description.md file
+          cat << 'EOF' > $PWD/_pr_description.md
+          ${{ github.event.pull_request.body }}
+          EOF
 
           # Configure OpenCode auth
           mkdir -p $HOME/.local/share/opencode/
           echo '{"zai-coding-plan": { "type": "api", "key": "'$ZAI_API_KEY'"}}' > $HOME/.local/share/opencode/auth.json
 
-          # Start OpenCode with PR review prompt
-          opencode run -m $OPENCODE_MODEL << 'EOF'
-          A new pull request has been created: "${{ github.event.pull_request.title }}"
+          # Configure MCP for OpenCode
+          mkdir -p $HOME/.config/opencode/
+          cat << EOF > $HOME/.config/opencode/mcp.json
+          {
+            "mcp": {
+              "context7": {
+                "type": "remote",
+                "url": "https://mcp.context7.com/mcp",
+                "enabled": true,
+                "headers": {
+                  "Authorization": "$CONTEXT7_API_KEY"
+                }
+              }
+            }
+          }
+          EOF
 
-          <repository>
-          ${{ github.repository }}
-          </repository>
-
-          <pr-number>
-          ${{ github.event.pull_request.number }}
-          </pr-number>
-
-          <pr-description>
-          ${{ github.event.pull_request.body }}
-          </pr-description>
-
-          You are a diligent senior engineer. Review the code changes in this pull request against the guidelines in the ".rules" file. Only review the changes found in diffs, but feel free to read the entire file to get more context. Make it clear the suggestions are merely suggestions and the human can decide what to do. Be concise and to the point. Start directly with the comment, no need to state e.g. "The guideline states...". Wrap codes in backticks (`) or triple backticks (```) for inline and multi-line code respectively.
+          # Start OpenCode with PR review prompt. Be careful when enclosing the prompt in quotes.
+          opencode run --model $OPENCODE_MODEL << 'EOF'
+          A new pull request has been created. You are a diligent bug finder. Check the code changes in this pull request for potential bugs. Read the rules file for guideline. Only review the changes found in diffs, but feel free to read the entire file to get more context. ONLY CHECK FOR POTENTIAL BUGS. Be concise and to the point. Start directly with the comment, no need to state e.g. "The guideline states...". Wrap codes in backticks (`) or triple backticks (```) for inline and multi-line code respectively.
 
           How to post the comments:
 
-          - Use the `post_pr_comment` command to create comments on the files for the violations.
           - Focus on changes in the diffs so you can leave the comment on the exact line number.
-          - If you have a suggested fix, wrap the suggestion in codeblock.
-          - Only create comments for actual violations. DO NOT run any `post_pr_comment` if no violations.
-          - Command format MUST be like this:
-            ./post_pr_comment '[comment]' '[path-to-file]' [line]
+          - If you have a suggested fix, wrap the suggestion in codeblock, like this:
+          ```suggestion
+          [your suggestion here]
+          ```
+          - Only create comments for actual violations. Do not run any `post_comment` if no violations.
+          - To post comment on a specific line, you MUST use this command format:
+            ./post_comment '[comment]' '[path-to-file]' [line]
+          - To post general comment to the PR, use this format:
+            ./post_comment '[comment]'
+
+          Once the review is complete, post a comment with summary of the review. Example:
+            ./post_comment '**✅ OpenCode reviewed your changes and found no bugs!**'
+
+          Begin!!
+
+          <repository>${{ github.repository }}</repository>
+          <pr_number>${{ github.event.pull_request.number }}</pr_number>
+          <pr_title>see: ./_pr_title.md</pr_title>
+          <pr_description>see: ./_pr_description.md</pr_description>
+          <rules_file>see: ./.cursorrules</rules_file>
           EOF
