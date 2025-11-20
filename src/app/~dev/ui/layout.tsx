@@ -51,8 +51,8 @@ export default function DevLayoutContainer({
         </div>
       </div>
       <div className={cn('mx-auto', size ? variants.size[size] : 'max-w-7xl')}>
-        <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-4">{children}</CardContent>
+        <Card>
+          <CardContent>{children}</CardContent>
         </Card>
       </div>
     </div>
