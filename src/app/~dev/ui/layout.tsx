@@ -1,7 +1,10 @@
 'use client'
 
+import { HomeIcon } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import ThemeToggle from '~/src/components/ThemeToggle'
+import { BreadcrumbSimple } from '~/src/components/ui/breadcrumb'
 import { Button } from '~/src/components/ui/button'
 import { Card, CardContent } from '~/src/components/ui/card'
 import { cn } from '~/src/utils/tailwind'
@@ -21,14 +24,31 @@ export default function DevLayoutContainer({
   children: React.ReactNode
 }) {
   const [size, setSize] = useState<keyof typeof variants.size>('default')
+  const pathname = usePathname()
 
   return (
     <div className="min-h-screen p-4">
-      <div className="flex items-center justify-end space-x-2 mb-4 sticky top-2 z-10">
-        <ToggleVariant label="xs" value={size} onChange={setSize} />
-        <ToggleVariant label="sm" value={size} onChange={setSize} />
-        <ToggleVariant label="md" value={size} onChange={setSize} />
-        <ThemeToggle side="bottom" variant="simple" />
+      <div className="flex items-center justify-between space-x-2 mb-4 sticky top-2 z-10">
+        <div className="flex items-center gap-2">
+          <BreadcrumbSimple
+            currentPath={pathname}
+            items={{
+              '/': (
+                <span className="flex items-center gap-2">
+                  <HomeIcon className="text-foreground" size={16} /> Home
+                </span>
+              ),
+              '/~dev': '~dev',
+              '/~dev/ui': 'ui',
+            }}
+          />
+        </div>
+        <div className="flex gap-2">
+          <ToggleVariant label="xs" value={size} onChange={setSize} />
+          <ToggleVariant label="sm" value={size} onChange={setSize} />
+          <ToggleVariant label="md" value={size} onChange={setSize} />
+          <ThemeToggle side="bottom" variant="simple" />
+        </div>
       </div>
       <div className={cn('mx-auto', size ? variants.size[size] : 'max-w-7xl')}>
         <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
