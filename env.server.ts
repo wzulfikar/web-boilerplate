@@ -9,6 +9,7 @@ import { env as clientEnv } from './env.client'
  */
 export const env = createEnv({
   server: {
+    PRODUCTION_URL: z.url(),
     SUPABASE_SECRET_KEY: z.string().optional(),
   },
   extends: [vercel(), clientEnv],
