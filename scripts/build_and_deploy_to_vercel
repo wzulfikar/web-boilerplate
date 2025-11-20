@@ -10,10 +10,11 @@ git config --global user.name "Github Action"
 git commit --allow-empty -m "$(git log -1 --pretty=%B)"
 
 # Move irrelevant folders to keep the build clean and optimized
-if [ -d "./app/~dev" ]; then
-  echo "[info] moving ~dev directory temporary /tmp"
-  mv ./app/~dev /tmp/~dev
-fi
+EXCLUDE_DIRS="./app/~dev ./commands ./src-tauri ./supabase/migrations ./trigger"
+TMP_DIR="/tmp/$(basename $PWD)"
+mkdir -p $TMP_DIR
+mv $EXCLUDE_DIRS $TMP_DIR
+echo "[info] moved excluded folders to $TMP_DIR"
 
 NODE_OPTIONS="--max-old-space-size=7000" SKIP_LINT=true SKIP_TYPE_CHECK=true time npx vercel build --prod
 
