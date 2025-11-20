@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-// import './globals.css'
-import './globals-custom-theme-example.css'
+import './globals.css'
+// import './globals-custom-theme-example.css' // Uncomment to use custom theme
 import { ThemeProvider } from 'next-themes'
 
 const geistSans = Geist({
