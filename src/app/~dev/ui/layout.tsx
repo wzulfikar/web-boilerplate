@@ -52,8 +52,7 @@ function ToggleVariant<T extends keyof typeof variants.size>({
     <Button
       className={cn(
         'font-mono transition bg-accent/20',
-        label === value &&
-          'border-2 border-inset border-foreground/80 dark:border-foreground font-bold',
+        label === value ? 'border-2 font-bold underline' : '',
       )}
       variant="outline"
       onClick={() => onChange(label === value ? ('default' as T) : label)}
