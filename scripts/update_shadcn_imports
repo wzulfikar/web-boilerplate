@@ -7,5 +7,5 @@ NEW_UTILS_PATH=$(cat components.json | jq -r '.aliases.utils')
 
 for file in $SHADCN_FILES; do
   gsed -i "s|\"$OLD_UTILS_PATH\"|\"$NEW_UTILS_PATH\"|g" "$file"
-  echo "Updated imports in $file"
+  bun fix "$file"
 done
