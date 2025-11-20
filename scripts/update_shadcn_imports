@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SHADCN_FILES=$(git ls-files --others --exclude-standard | grep 'ui/.*\.tsx')
+
+OLD_UTILS_PATH='~/lib/utils'
+NEW_UTILS_PATH=$(cat components.json | jq -r '.aliases.utils')
+
+for file in $SHADCN_FILES; do
+  gsed -i "s|\"$OLD_UTILS_PATH\"|\"$NEW_UTILS_PATH\"|g" "$file"
+  echo "Updated imports in $file"
+done

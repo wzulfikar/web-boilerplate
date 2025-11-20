@@ -8,7 +8,8 @@
     "start": "next start",
     "check": "biome check",
     "fix": "biome check --fix",
-    "cn": "bunx --bun shadcn@latest"
+    "cn": "bunx --bun shadcn@latest",
+    "postcn": "./scripts/update_shadcn_imports"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.16",

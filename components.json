@@ -13,10 +13,10 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "~/src/components",
-    "utils": "~/src/lib/tailwind",
+    "utils": "~/src/lib/utils",
     "ui": "~/src/components/ui",
     "lib": "~/src/lib",
-    "hooks": "~/hooks"
+    "hooks": "~/src/components/hooks"
   },
   "registries": {}
 }
