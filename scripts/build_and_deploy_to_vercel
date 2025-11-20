@@ -3,18 +3,26 @@
 # Pull environment variables from Vercel to local file so it can be used by the build
 npx vercel pull --environment=production --token=$VERCEL_TOKEN
 
-# Vercel requires author commit to be team member of the project
+# # Vercel requires author commit to be team member of the project
 echo "[info] updating commit author's email"
 git config --global user.email "$VERCEL_EMAIL"
 git config --global user.name "Github Action"
 git commit --allow-empty -m "$(git log -1 --pretty=%B)"
 
-# Move irrelevant folders to keep the build clean and optimized
-EXCLUDE_DIRS="./app/~dev ./commands ./src-tauri ./supabase/migrations ./trigger"
-TMP_DIR="/tmp/$(basename $PWD)"
-mkdir -p $TMP_DIR
-mv $EXCLUDE_DIRS $TMP_DIR
-echo "[info] moved excluded folders to $TMP_DIR"
+read -ra EXCLUDE_DIRS <<< "app/~dev commands src-tauri trigger"
+ARCHIVE_FILE="./excluded_dirs.tar.gz"
+exclude_dirs() {
+    echo "[info] Archiving excluded directories to $ARCHIVE_FILE"
+    tar -czf "$ARCHIVE_FILE" "${EXCLUDE_DIRS[@]}"
+    trash "${EXCLUDE_DIRS[@]}"
+}
+restore_dirs() {
+    echo "[info] Restoring excluded directories..."
+    tar -xzf "$ARCHIVE_FILE" -C .
+    rm -f "$ARCHIVE_FILE"
+}
+
+exclude_dirs
 
 NODE_OPTIONS="--max-old-space-size=7000" SKIP_LINT=true SKIP_TYPE_CHECK=true time npx vercel build --prod
 
@@ -34,3 +42,5 @@ if [ $? -ne 0 ]; then
   echo "[error] Deployment failed, stopping deployment"
   exit 1
 fi
+
+trap restore_dirs EXIT
