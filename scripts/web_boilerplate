@@ -1,0 +1,20 @@
+#!/bin/bash
+
+check_rules_file() {
+    RULES_FILE=${RULES_FILE:-.rules}
+    opencode --model "$OPENCODE_MODEL" run << EOF | glow
+We have agent rules file at $RULES_FILE which should always reflect the codebase. Please check the codebase against the rule and give me a review if is should be updated or improved.
+
+<rules_file>
+$(cat "$RULES_FILE")
+</rules_file>
+EOF
+}
+
+# Check if the agent rules file is still reflecting the codebase
+if [[ "$1" == "check_rules_file" ]]; then
+    check_rules_file
+else
+    echo "[error] Invalid command: $1"
+    echo "Hint: check './scripts/$(basename "$0")' to see all possible commands."
+fi

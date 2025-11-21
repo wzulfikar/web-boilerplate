@@ -13,6 +13,7 @@
     "secrets:edit": "node-credentials edit --path .env.secrets",
     "secrets:decrypt": "node-credentials decrypt --path .env.secrets",
     "secrets:encrypt": "node-credentials encrypt --path .env.secrets",
+    "wb": "./scripts/web_boilerplate",
     "postcn": "./scripts/update_shadcn_imports"
   },
   "dependencies": {
