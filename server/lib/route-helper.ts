@@ -50,25 +50,6 @@ export const parseBody =
 
 /**
  * Helper to fetch a row from Supabase based on path param.
- * Calls `getRowFromPath` under the hood.
- */
-export const rowFromPath = {
-  recordingId: <T extends string>(columns: T) =>
-    getRowFromPath({
-      table: 'recordings',
-      subject: 'Meeting note',
-      columns,
-    }),
-  workflowId: <T extends string>(columns: T) =>
-    getRowFromPath({
-      table: 'workflows',
-      subject: 'Workflow',
-      columns,
-    }),
-}
-
-/**
- * Helper to fetch a row from Supabase based on path param.
  * User must be authenticated.
  * @param pathParam
  * @param params
@@ -104,16 +85,20 @@ export function getRowFromPath<
       ? ctx.parsed.path.params[params.pathParam]
       : Object.entries(ctx.parsed.path.params)[0][1]
 
+    // TODO: fix type and remove `as any`
     const row = skipOwnershipCheck
       ? await supabase
-          .from(table)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .from(table as any)
           .select(columns)
           .eq(idColumn, pathParamValue)
           .maybeSingle()
       : await supabase
-          .from(table)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .from(table as any)
           .select(columns)
           .eq(idColumn, pathParamValue)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .eq('user_id', user.id as any)
           .maybeSingle()
 

@@ -1,12 +1,8 @@
 import { waitUntil } from '@vercel/functions'
 import { getErrorInfo, throwIfNull } from 'saas-maker'
-import {
-  createRoute,
-  type ErrorHandlerPayload,
-  json,
-  reportServerError,
-} from 'saas-maker/server'
+import { createRoute, type ErrorHandlerPayload, json } from 'saas-maker/server'
 import type { ZodError } from 'zod'
+import { reportServerError } from '~/shared/lib/report-error/server'
 import { zodErrorToObj } from '~/shared/utils/zod-helper'
 import { getUser } from './lib/auth/getUser'
 
@@ -30,6 +26,12 @@ export const userRoute = baseRoute.extend({ name: 'userRoute' }).parse({
     return { user }
   },
 })
+
+/**
+ * Helper to fetch a row from Supabase based on path param.
+ * Calls `getRowFromPath` under the hood.
+ */
+export const rowFromPath = {}
 
 async function globalErrorHandler(ctx: ErrorHandlerPayload) {
   const errorInfo = getErrorInfo(ctx.error.cause) || getErrorInfo(ctx.error)
