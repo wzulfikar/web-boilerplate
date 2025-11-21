@@ -8,7 +8,7 @@ These are the technology we use in this repo.
 - ShadCN for component building block. For ShadCN components that we use often, we may add "simple" variant in the component file. For example, the `components/ui/breadcrumb.tsx` contains the original ShadCN code AND the `BreadcrumbSimple` component which we added.
 - Biome for formatter and linter. We try to use the latest biome version, which is reflected in its config file at `biome.json`.
 - Github Action for CI/CD. 
-- MCP to help AI agents. Example:
+- MCP to help AI agents. The MCP servers are exposed via editor integration (like Zed). Examples of available MCP:
   - use context7 to get the updated documentation of our tech stack
   - use nextjs MCP to interact with Next.JS development server
 
