@@ -1,0 +1,5 @@
+[test]
+preload = ["./tests/happydom.ts", "./tests/bun-test-setup.ts"]
+
+[install]
+optional = false

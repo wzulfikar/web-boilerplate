@@ -1,0 +1,11 @@
+_assert_commands_exist() {
+    local commands_to_check="$1"
+    local missing=()
+    for cmd in $commands_to_check; do
+        [[ -x "$(command -v "$cmd")" ]] || missing+=("$cmd")
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "[error] Missing commands need to be installed: $(IFS=', '; echo "${missing[*]}")"
+        exit 1
+    fi
+}
