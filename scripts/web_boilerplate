@@ -1,6 +1,19 @@
 #!/bin/bash
 
+_assert_commands_exist() {
+    local commands_to_check="$1"
+    local missing=()
+    for cmd in $commands_to_check; do
+        [[ -x "$(command -v "$cmd")" ]] || missing+=("$cmd")
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "[error] Some required commands are missing. Please install to continue: $(IFS=', '; echo "${missing[*]}")"
+        exit 1
+    fi
+}
+
 check_rules_file() {
+    _assert_commands_exist "opencoded glow"
     RULES_FILE=${RULES_FILE:-.rules}
     opencode --model "$OPENCODE_MODEL" run << EOF | glow
 We have agent rules file at $RULES_FILE which should always reflect the codebase. Please check the codebase against the rule and give me a review if is should be updated or improved.
