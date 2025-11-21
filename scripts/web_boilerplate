@@ -1,16 +1,6 @@
 #!/bin/bash
 
-_assert_commands_exist() {
-    local commands_to_check="$1"
-    local missing=()
-    for cmd in $commands_to_check; do
-        [[ -x "$(command -v "$cmd")" ]] || missing+=("$cmd")
-    done
-    if [[ ${#missing[@]} -gt 0 ]]; then
-        echo "[error] Missing commands need to be installed: $(IFS=', '; echo "${missing[*]}")"
-        exit 1
-    fi
-}
+source ./scripts/_helper
 
 check_rules_file() {
     _assert_commands_exist "opencode glow"
@@ -24,9 +14,16 @@ $(cat "$RULES_FILE")
 EOF
 }
 
+setup() {
+    echo "[info] installing developer commands..."
+    npm i -g opencode-ai @biomejs/biome @typescript/native-preview
+}
+
 # Check if the agent rules file is still reflecting the codebase
 if [[ "$1" == "check_rules_file" ]]; then
     check_rules_file
+elif [[ "$1" == "setup" ]]; then
+    setup
 else
     echo "[error] Invalid command: $1"
     echo "Hint: check './scripts/$(basename "$0")' to see all possible commands."
