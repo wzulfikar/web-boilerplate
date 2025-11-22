@@ -9,6 +9,7 @@
     "dev:evals": "cd evals && bun dev",
     "build": "next build",
     "start": "next start",
+    "lint": "biome check",
     "check": "concurrently 'biome check' tsgo",
     "fix": "biome check --fix",
     "cn": "bunx --bun shadcn@latest",
@@ -47,7 +48,7 @@
     "papaparse": "^5.5.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "saas-maker": "^0.0.17-rc.1",
+    "saas-maker": "^0.0.17-rc.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.12"

@@ -1,5 +1,7 @@
 import z from 'zod'
-import { parseQuery, publicRoute } from '~/server/routes'
+import { parseQuery, publicRoute, type RouteType } from '~/server/routes'
+
+export type GetBoilerplateExample = RouteType<typeof GET.inferRouteType>
 
 const querySchema = z.object({
   name: z.string(),
@@ -9,8 +11,9 @@ const querySchema = z.object({
 // curl 'localhost:3000/api/boilerplate-example?name=John'
 export const GET = publicRoute
   .parse({
+    path: '/api/boilerplate-example' as const,
     query: parseQuery(querySchema),
   })
   .handle(({ parsed }) => {
-    return { success: true, message: `Hello ${parsed.query.name}!` }
+    return { data: `Hello ${parsed.query.name}!` }
   })

@@ -3,15 +3,16 @@ import { GET } from '~/src/app/api/boilerplate-example/route'
 
 describe('GET', () => {
   test('returns success message when query parameter is correct parameter', async () => {
-    const response = await GET.invoke({ query: { name: 'john' } })
-    expect(response).toEqual({ success: true, message: 'Hello john!' })
+    const response = await GET.invoke({
+      path: '/api/boilerplate-example',
+      query: { name: 'john' },
+    })
+    expect(response).toEqual({ data: 'Hello john!' })
   })
 
   test('returns error message when query parameter is incorrect', async () => {
-    const response = await GET.invoke({ query: { named: 'john' } })
-    // TODO: fix in saas-maker: .invoke should return json for error or successful flow
-    const error = await (response as unknown as Response).json()
-    expect(error).toEqual({
+    const response = await GET.invoke({ query: { wrong_field: 'john' } })
+    expect(response).toEqual({
       error: {
         code: 'BAD_REQUEST',
         details: {
