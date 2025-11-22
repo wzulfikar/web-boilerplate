@@ -9,6 +9,7 @@
     "dev:evals": "cd evals && bun dev",
     "build": "next build",
     "start": "next start",
+    "lint": "biome check",
     "check": "concurrently 'biome check' tsgo",
     "fix": "biome check --fix",
     "cn": "bunx --bun shadcn@latest",
