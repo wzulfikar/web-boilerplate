@@ -1,18 +1,16 @@
 import ky from 'ky'
-
 import { AppError } from 'saas-maker'
 import { env } from '~/env.client'
 import type { RouteType } from '~/server/routes'
-import { isDevelopment } from '~/shared/utils/env'
 
-export const createApiClient = (params?: {
-  prefixUrl?: string
+export const createApiClient = (params: {
+  prefixUrl: string
   timeout?: number
   fetch?: typeof fetch
 }) => {
   const kyInstance = ky.create({
-    prefixUrl: params?.prefixUrl ?? env.NEXT_PUBLIC_BASE_URL,
-    timeout: params?.timeout ?? (isDevelopment() ? 120_000 : 30_000),
+    prefixUrl: params.prefixUrl,
+    timeout: params.timeout,
     fetch: params?.fetch,
     throwHttpErrors: false,
   })
@@ -112,4 +110,6 @@ export const createApiClient = (params?: {
  * If `json` is provided, uses `POST` method. Pass the `method` param to
  * override the default method. Returns JSON response.
  */
-export const apiClient = createApiClient()
+export const apiClient = createApiClient({
+  prefixUrl: env.NEXT_PUBLIC_BASE_URL,
+})
