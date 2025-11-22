@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'bun:test'
-import type { Result } from 'saas-maker'
 import { GET } from '~/src/app/api/boilerplate-example/route'
 
 describe('GET', () => {
